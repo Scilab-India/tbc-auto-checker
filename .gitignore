@@ -1,0 +1,10 @@
+# gitignore for tbc-auto-checker
+
+*~
+*.zip
+*.gif
+*.GIF
+*.JPEG
+*.jpeg
+*.JGP
+*.jpg
