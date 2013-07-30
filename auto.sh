@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with tbc-auto-checker.  If not, see <http://www.gnu.org/licenses/>.
 
-# IMPORTANT:Please modify variable `OUTPUT` according to your scilab path
 # NOTE: scilab version 5.4.0 or higher is recommended.
 
 
-# SET YOUR SCILAB PATH HERE
+# Set your scilab path here
 SCI_PATH="/home/sachin/Downloads/scilab-5.4.0-beta-2/bin/scilab-adv-cli"
-
+# set where to store graph images
+SCI_GRAPH_PATH="${HOME}/Downloads/tbc_graphs"
 
 echo "Hello $USER, Welcome to automatic code check for Scilab textbook companion."
 echo "The Date & Time is:" `date`
@@ -33,8 +33,14 @@ IFS=$(echo -en "\n\b\:\,")	# define Internal Field Seperator(for
 				# directory names with spaces)
 
 # cleaning
-rm -rvf ${HOME}/Downloads/tbc_graphs
-rm -rvf *.log
+# Remove previous graphs
+if [ -d "${SCI_GRAPH_PATH}" -a ! -h "${SCI_GRAPH_PATH}" ];
+then
+    rm -rvf "${SCI_GRAPH_PATH}"
+else
+    echo "No previous graphs found."
+fi
+rm -rvf *.log			# remove previous log files
 
 function scan_sce_for_errors() {
     # Generate output log, error log of both text and graphical based output
@@ -47,9 +53,11 @@ function scan_sce_for_errors() {
     # make a list of all .sce file(with complete path). Exclude
     # scanning 'DEPENDENCIES' DIR
     SCE_FILE_LIST=$(find ${ZIPFILE} -type f -iname "*.sce" ! -path "*/DEPENDENCIES*")
+    SCE_FILE_COUNT=$(echo "${SCE_FILE_LIST}" | wc -l)
+    echo -e "Total number of .sce files(without counting DEPENDENCIES directory): ${SCE_FILE_COUNT}\n" >> ./output_${ZIPFILE}.log 
 
     # make directory for storing graphs(each dir will be named after a book)
-    mkdir -p ${HOME}/Downloads/tbc_graphs/${ZIPFILE}
+    mkdir -p ${SCI_GRAPH_PATH}/${ZIPFILE}
 
     for sce_file in ${SCE_FILE_LIST};
     do
@@ -58,9 +66,8 @@ function scan_sce_for_errors() {
 	if [ -z "${CAT_FILE}" ];
 	then
 	    BASE_FILE_NAME=$(basename ${sce_file} .sce)
-	    echo "Plain file"
-	    echo "-------------------------------"
-            echo "--------${sce_file}------------"
+	    echo "--------- Text output file --------------"
+            echo "------------- ${sce_file}  --------------"
 	    echo "" >> ${sce_file}
 	    echo "exit();" >> ${sce_file} 
 	    sed -i '1s/^/mode(2);/' ${sce_file}
@@ -81,13 +88,12 @@ function scan_sce_for_errors() {
 	    unset OUTPUT
 	    unset BASE_FILE_NAME
 	else
-	    echo "Graph file"
+	    echo "-------- Graph file -----------"
 	    echo "--------${sce_file}------------"
-            echo "-------------------------------"
 	    echo "" >> ${sce_file}
 	    BASE_FILE_NAME=$(basename ${sce_file} .sce)
             # change path for storing graph image file
-	    echo "xinit('${HOME}/Downloads/tbc_graphs/${ZIPFILE}/${BASE_FILE_NAME}');xend();exit();" >> ${sce_file} 
+	    echo "xinit('${SCI_GRAPH_PATH}/${ZIPFILE}/${BASE_FILE_NAME}');xend();exit();" >> ${sce_file} 
 	    sed -i '1s/^/mode(2);errcatch(-1,"stop");driver("GIF");/' ${sce_file}
 	    sed -i 's/clc()//g' ${sce_file}
 	    sed -i 's/close;//g' ${sce_file}	
@@ -117,7 +123,7 @@ function remove_previous_dirs_and_unzip(){
     if [ -d "${ZIP_DIR}" -a ! -h "${ZIP_DIR}" ]; 
     # file is a directory(true) and is not a symbolic link
     then
-	# echo ${ZIP_DIR}
+        # echo ${ZIP_DIR}
 	rm -rvf "${ZIP_DIR}"
 	wait
 	scan_sce_for_errors "$1" "${ZIP_DIR}" # call function to generate output
@@ -128,12 +134,19 @@ function remove_previous_dirs_and_unzip(){
 }
 
 # make a list of .zip files
-ZIP_FILE_LIST=$(ls -1 *.zip)
-for ZIP_FILE in ${ZIP_FILE_LIST}:
-do
-    # loop through the list
-    remove_previous_dirs_and_unzip "${ZIP_FILE}"
-done
+if [ -e "$(find . -type f -iname *.zip)" ];
+then
+    ZIP_FILE_LIST=$(ls -1 *.zip) 
+    for ZIP_FILE in ${ZIP_FILE_LIST}:
+    do
+        # loop through the list
+	remove_previous_dirs_and_unzip "${ZIP_FILE}"
+    done
+else
+    echo "This Directory does not contains any ZIP files"
+    echo "Please copy ZIP file(s) inside this directory."
+    exit 1
+fi
 
 IFS=$SAVEIFS			# restore value of IFS
 
