@@ -66,6 +66,7 @@ function scan_sce_for_errors() {
 	    sed -i '1s/^/mode(2);/' ${sce_file}
 	    sed -i '1s/^/errcatch(-1,"stop");/' ${sce_file}
 	    sed -i 's/clc()//g' ${sce_file}
+	    sed -i 's/close;//g' ${sce_file}
 	    # run command
             OUTPUT=`${SCI_PATH} -nb -nwni -f ${sce_file}`
 	    echo $OUTPUT
@@ -74,7 +75,7 @@ function scan_sce_for_errors() {
 		echo "ERROR: ${sce_file}" >> ./error_${ZIPFILE}.log
 		echo "${OUTPUT}" >> ./error_${ZIPFILE}.log
 	    else
-		echo "#################${sce_file}#####################" >> ./output_${ZIPFILE}.log
+		echo "################# ${sce_file} #####################" >> ./output_${ZIPFILE}.log
 		echo "${OUTPUT}" >> ./output_${ZIPFILE}.log
 	    fi
 	    unset OUTPUT
@@ -88,16 +89,17 @@ function scan_sce_for_errors() {
             # change path for storing graph image file
 	    echo "xinit('${HOME}/Downloads/tbc_graphs/${ZIPFILE}/${BASE_FILE_NAME}');xend();exit();" >> ${sce_file} 
 	    sed -i '1s/^/mode(2);errcatch(-1,"stop");driver("GIF");/' ${sce_file}
-	    sed -i 's/clc()//g' ${sce_file}	
+	    sed -i 's/clc()//g' ${sce_file}
+	    sed -i 's/close;//g' ${sce_file}	
 	    # run command
 	    OUTPUT=`${SCI_PATH} -nb -nogui -f ${sce_file}`
 	    echo ${OUTPUT}
 	    if [[ "${OUTPUT}" =~ "error" ]];
             then
-		echo "#############ERROR: ${sce_file}##################" >> ./error_graph_${ZIPFILE}.log
+		echo "ERROR: ${sce_file}" >> ./error_graph_${ZIPFILE}.log
 		echo "${OUTPUT}" >> ./error_graph_${ZIPFILE}.log
 	    else
-		echo "###################### ${sce_file}###################" >> ./output_graph_${ZIPFILE}.log
+		echo "###################### ${sce_file} ###################" >> ./output_graph_${ZIPFILE}.log
 		echo "${OUTPUT}" >> ./output_graph_${ZIPFILE}.log
 	    fi
 	    unset OUTPUT
