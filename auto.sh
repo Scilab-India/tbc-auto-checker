@@ -69,6 +69,8 @@ function scan_sce_for_errors() {
     SCE_FILE_LIST=$(find ${ZIPFILE} -type f -iname "*.sce" ! \
 	-path "*/DEPENDENCIES*" | \
 	awk -vFS=/ -vOFS="." '{print $NF,$0}' | \
+	sed 's/^[[:upper:]]*//g' | \
+	sed 's/^[[:lower:]]*//g' | \
 	sort -n -t _ -k1 -k2 | cut -d"." -f3-)
     
     SCE_FILE_COUNT=$(echo "${SCE_FILE_LIST}" | wc -l)
