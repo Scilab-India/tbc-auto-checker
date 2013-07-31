@@ -52,7 +52,25 @@ function scan_sce_for_errors() {
 
     # make a list of all .sce file(with complete path). Exclude
     # scanning 'DEPENDENCIES' DIR
-    SCE_FILE_LIST=$(find ${ZIPFILE} -type f -iname "*.sce" ! -path "*/DEPENDENCIES*")
+
+    # That awk command says the field separator FS is set to /; this
+    # affects the way it reads fields. The output field separator OFS
+    # is set to "."; this affects the way it prints records. This is
+    # intentionally done so that 'cut' will take "." as a field
+    # Seperator during final sort operation. The next statement says
+    # print the last column (NF is the number of fields in the record,
+    # so it also happens to be the index of the last field) as well as
+    # the whole record ($0 is the whole record); it will print them
+    # with the OFS between them. Then the list is sorted, treating _
+    # as the field separator - since we have the filename first in the
+    # record, it will sort by that. Then the cut prints only fields 3
+    # through the end, again treating "." as the field separator.
+
+    SCE_FILE_LIST=$(find ${ZIPFILE} -type f -iname "*.sce" ! \
+	-path "*/DEPENDENCIES*" | \
+	awk -vFS=/ -vOFS="." '{print $NF,$0}' | \
+	sort -n -t _ -k1 -k2 | cut -d"." -f3-)
+    
     SCE_FILE_COUNT=$(echo "${SCE_FILE_LIST}" | wc -l)
     echo -e "Total number of .sce files(without counting DEPENDENCIES directory): ${SCE_FILE_COUNT}\n" >> ./output_${ZIPFILE}.log 
 
