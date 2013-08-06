@@ -66,13 +66,12 @@ function scan_sce_for_errors() {
     # record, it will sort by that. Then the cut prints only fields 3
     # through the end, again treating "." as the field separator.
 
-    SCE_FILE_LIST=$(find ${ZIPFILE} -type f -iname "*.sce" ! \
+    SCE_FILE_LIST=$(find ${ZIPFILE} -type f -iname "*.sce" -o -iname "*.sci" ! \
 	-path "*/DEPENDENCIES*" | \
 	awk -vFS=/ -vOFS="." '{print $NF,$0}' | \
 	sed 's/^[[:upper:]]*//g' | \
 	sed 's/^[[:lower:]]*//g' | \
 	sort -n -t _ -k1 -k2 | cut -d"." -f3-)
-    
     SCE_FILE_COUNT=$(echo "${SCE_FILE_LIST}" | wc -l)
     echo -e "Total number of .sce files(without counting DEPENDENCIES directory): ${SCE_FILE_COUNT}\n" >> ./output_${ZIPFILE}.log 
 
@@ -92,6 +91,7 @@ function scan_sce_for_errors() {
 	    echo "exit();" >> ${sce_file} 
 	    sed -i '1s/^/mode(2);/' ${sce_file}
 	    sed -i '1s/^/errcatch(-1,"stop");/' ${sce_file}
+	    sed -i 's/xdel(winsid());//g' ${sce_file}
 	    sed -i 's/clc()//g' ${sce_file}
 	    sed -i 's/close;//g' ${sce_file}
 	    # run command
@@ -115,6 +115,7 @@ function scan_sce_for_errors() {
             # change path for storing graph image file
 	    echo "xinit('${SCI_GRAPH_PATH}/${ZIPFILE}/${BASE_FILE_NAME}');xend();exit();" >> ${sce_file} 
 	    sed -i '1s/^/mode(2);errcatch(-1,"stop");driver("GIF");/' ${sce_file}
+	    sed -i 's/xdel(winsid());//g' ${sce_file}
 	    sed -i 's/clc()//g' ${sce_file}
 	    sed -i 's/close;//g' ${sce_file}	
 	    # run command
