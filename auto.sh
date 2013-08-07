@@ -95,7 +95,7 @@ function scan_sce_for_errors() {
 	    sed -i 's/clc()//g' ${sce_file}
 	    sed -i 's/close;//g' ${sce_file}
 	    # run command
-            OUTPUT=`${SCI_PATH} -nb -nwni -f ${sce_file}`
+            OUTPUT=` timeout 5 ${SCI_PATH} -nb -nwni -f ${sce_file}`
 	    echo $OUTPUT
 	    if [[ "${OUTPUT}" =~ "!--error" ]];
             then
@@ -118,7 +118,7 @@ function scan_sce_for_errors() {
 	    sed -i 's/clc()//g' ${sce_file}
 	    sed -i 's/close;//g' ${sce_file}	
 	    # run command
-	    OUTPUT=`${SCI_PATH} -nb -nogui -f ${sce_file}`
+	    OUTPUT=`timeout 5 ${SCI_PATH} -nb -nogui -f ${sce_file}`
 	    echo ${OUTPUT}
 	    if [[ "${OUTPUT}" =~ "error" ]];
             then
