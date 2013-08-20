@@ -155,7 +155,7 @@ function remove_previous_dirs_and_unzip(){
 }
 
 # make a list of .zip files
-if [ -e "$(find . -type f -iname *.zip)" ];
+if [ ! -z "$(find . -type f -iname '*.zip')" ];
 then
     ZIP_FILE_LIST=$(ls -1 *.zip) 
     for ZIP_FILE in ${ZIP_FILE_LIST}:
