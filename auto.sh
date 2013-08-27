@@ -80,7 +80,7 @@ function scan_sce_for_errors() {
 
     for sce_file in ${SCE_FILE_LIST};
     do
-	CAT_FILE=$(egrep -r "plot\S[0-9]?[d]?[0-9]?[(]*[)]*" ${sce_file})
+	CAT_FILE=$(egrep -r "subplot\S[0-9]?[d]?[0-9]?[(]*[)]*|clf\S[0-9]?[d]?[0-9]?[(]*[)]*|plot\S[0-9]?[d]?[0-9]?[(]*[)]*" ${sce_file})
         #echo ${CAT_FILE}
 	if [ -z "${CAT_FILE}" ];
 	then
