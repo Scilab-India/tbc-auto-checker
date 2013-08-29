@@ -2,7 +2,8 @@
 # Auto checker script for Scilab Textbook Companion
 # http://scilab.in/Textbook_Companion_Project
 
-# Original author: Lavitha Pereira
+# Original author: Lavitha Pereira <lavitha89@gmail.com>
+# Contributor: Sachin Patil <isachin@iitb.ac.in>
 
 # This file is part of tbc-auto-checker.
 # tbc-auto-checker is free software: you can redistribute it and/or modify
@@ -20,7 +21,7 @@
 
 
 # Set your scilab path here
-SCI_PATH="/home/sachin/Downloads/scilab-5.4.0-beta-2/bin/scilab-adv-cli"
+SCI_PATH="${HOME}/Downloads/scilab-5.4.0-beta-2/bin/scilab-adv-cli"
 # set where to store graph images
 SCI_GRAPH_PATH="${HOME}/Downloads/tbc_graphs"
 
@@ -158,7 +159,7 @@ function remove_previous_dirs_and_unzip(){
 if [ ! -z "$(find . -type f -iname '*.zip')" ];
 then
     ZIP_FILE_LIST=$(ls -1 *.zip) 
-    for ZIP_FILE in ${ZIP_FILE_LIST}:
+    for ZIP_FILE in ${ZIP_FILE_LIST};
     do
         # loop through the list
 	remove_previous_dirs_and_unzip "${ZIP_FILE}"
